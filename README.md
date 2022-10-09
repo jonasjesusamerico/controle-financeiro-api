@@ -8,4 +8,4 @@
 ## ETAPAS
 
 - [x] Início do projeto
-- [ ] Criar Dockerfile junto com docker-compose.yml
+- [x] Criar Dockerfile junto com docker-compose.yml
