@@ -1,0 +1,19 @@
+version: '3'
+
+services: 
+
+  app:
+    container_name: controle-financeiro-api
+    build: 
+      context: ./
+      dockerfile: Dockerfile
+    volumes: 
+      - /api-controle-financeiro:/app
+    networks: 
+      - controle-financeiro-network
+    ports: 
+      - "3000:3000"
+
+networks: 
+  controle-financeiro-network:
+    driver: bridge   

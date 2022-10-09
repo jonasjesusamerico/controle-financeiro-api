@@ -2,6 +2,10 @@
 
 * Aplição tem como objetivo aplicar os conhecimeno adquirido ao longo do tem com a linguagem GOlang.
 
-## Tecnologias
+## TECNOLOGIAS
 * GOlang
 
+## ETAPAS
+
+- [x] Início do projeto
+- [ ] Criar Dockerfile junto com docker-compose.yml
