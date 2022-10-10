@@ -12,8 +12,7 @@ FROM gcr.io/distroless/base-debian10
 WORKDIR /
 
 COPY --from=build /server /server
-
-EXPOSE 8000
+COPY --from=build ./app/.env .
 
 USER nonroot:nonroot
 

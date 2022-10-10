@@ -1,9 +1,20 @@
 version: '3'
 
 services: 
+  postgres:
+    container_name: postgres
+    image: postgres
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports: 
+      - "5432:5432"
 
-  app:
+  controle-financeiro-api:
     container_name: controle-financeiro-api
+    env_file: .env
     build: 
       context: ./
       dockerfile: Dockerfile
@@ -16,4 +27,7 @@ services:
 
 networks: 
   controle-financeiro-network:
-    driver: bridge   
+    driver: bridge
+
+volumes:
+  api-controle-financeiro_data:
