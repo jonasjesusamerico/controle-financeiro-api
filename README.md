@@ -16,6 +16,7 @@
 - [x] Início do projeto
 - [x] Criar Dockerfile junto com docker-compose.yml
 - [x] Configura o banco de dados Postgres
-- [ ] Verificar opção de migration para versionamento do sql
-- [ ] Adicionar router e criar a primeira rota
-- [x] Adicionar arquivo .env
+- [ ] ~~Verificar opção de migration para versionamento do sql~~ (Criar novo projeto apenas para executar as migrations)
+- [x] Adicionar router e criar a primeira rota
+    - [ ] Padronizar rotas
+- [x] Adicionar arquivo .env 
