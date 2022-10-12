@@ -4,12 +4,16 @@
 
 # CONTROLE FINANCEIRO API
 
-* Aplição tem como objetivo aplicar os conhecimeno adquirido ao longo do tempo com a linguagem GOlang.
+* Aplição tem como objetivo aplicar os conhecimento adquirido ao longo do tempo com a linguagem GOlang.
 
 ## TECNOLOGIAS
-* GOlang - Liguagem para desenvolvimento
-* Gin-Gonic - Lib responsável pelo controle de rota da aplicação
-* PostgreSQL - Banco de dados
+[PostgreSQL](https://www.postgresql.org/)
+* Desenvolvimento
+    * [GOlang](https://go.dev/) - Liguagem para desenvolvimento
+    * [Gin-Gonic](https://gin-gonic.com/docs/) - Lib responsável pelo controle de rota da aplicação
+    * [Package validator](https://github.com/go-playground/validator) - Responsável para validação na construção das struct
+* Baco de dados
+    * [PostgreSQL](https://www.postgresql.org/) - Banco de dados
 
 ## ETAPAS
 

@@ -3,12 +3,15 @@ package controllers
 import (
 	"net/http"
 	"strconv"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
 	"github.com/joninhasamerico/controle-financeiro-api/internal/model"
+	"github.com/joninhasamerico/controle-financeiro-api/internal/repository"
 	"github.com/joninhasamerico/controle-financeiro-api/internal/services"
 	"github.com/sirupsen/logrus"
+	"gorm.io/gorm"
 )
 
 type ResponseError struct {
@@ -21,10 +24,13 @@ type UsuarioController struct {
 	service services.IService
 }
 
-// NewUsuarioController will initialize the usuarios/ resources endpoint
-func NewUsuarioController(e *gin.RouterGroup, us services.IService) {
+func NewUsuarioController(e *gin.RouterGroup, dbCtx *gorm.DB, timeoutCtx time.Duration) {
+
+	usuarioRepository := repository.NewUsuarioRepository(dbCtx)
+	usuarioService := services.NewUsuarioService(usuarioRepository, timeoutCtx)
+
 	handler := &UsuarioController{
-		service: us.(*services.UsuarioService),
+		service: usuarioService,
 	}
 
 	{
@@ -48,7 +54,6 @@ func (a *UsuarioController) FetchUsuario(c *gin.Context) {
 	c.JSON(http.StatusOK, listAr)
 }
 
-// GetByID will get article by given id
 func (a *UsuarioController) GetByID(c *gin.Context) {
 	idP, err := strconv.Atoi(c.Param("id"))
 	if err != nil {

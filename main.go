@@ -10,9 +10,7 @@ import (
 	"github.com/joninhasamerico/controle-financeiro-api/configs"
 	"github.com/joninhasamerico/controle-financeiro-api/internal/controllers"
 	"github.com/joninhasamerico/controle-financeiro-api/internal/database"
-	"github.com/joninhasamerico/controle-financeiro-api/internal/repository"
 	"github.com/joninhasamerico/controle-financeiro-api/internal/router/middlewares"
-	"github.com/joninhasamerico/controle-financeiro-api/internal/services"
 	"gorm.io/gorm"
 )
 
@@ -46,7 +44,5 @@ func setup(engine *gin.Engine, dbCtx *gorm.DB) {
 	V1_GROUP := API_GROUP.Group("/v1")
 
 	/* Usuario */
-	usuarioRepository := repository.NewUsuarioRepository(dbCtx)
-	usuarioService := services.NewUsuarioService(usuarioRepository, timeoutCtx)
-	controllers.NewUsuarioController(V1_GROUP, usuarioService)
+	controllers.NewUsuarioController(V1_GROUP, dbCtx, timeoutCtx)
 }
