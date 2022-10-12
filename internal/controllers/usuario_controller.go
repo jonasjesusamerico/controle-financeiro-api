@@ -22,17 +22,16 @@ type UsuarioController struct {
 }
 
 // NewUsuarioController will initialize the usuarios/ resources endpoint
-func NewUsuarioController(e *gin.Engine, us services.IService) {
+func NewUsuarioController(e *gin.RouterGroup, us services.IService) {
 	handler := &UsuarioController{
 		service: us.(*services.UsuarioService),
 	}
 
-	grp1 := e.Group("/v1")
 	{
-		grp1.GET("/usuarios", handler.FetchUsuario)
-		grp1.POST("/usuarios", handler.Save)
-		grp1.GET("/usuarios/:id", handler.GetByID)
-		grp1.DELETE("/usuarios/:id", handler.Delete)
+		e.GET("/usuarios", handler.FetchUsuario)
+		e.POST("/usuarios", handler.Save)
+		e.GET("/usuarios/:id", handler.GetByID)
+		e.DELETE("/usuarios/:id", handler.Delete)
 	}
 }
 
