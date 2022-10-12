@@ -1,114 +1,141 @@
 package controllers
 
 import (
-	"errors"
 	"net/http"
 	"strconv"
 
 	"github.com/gin-gonic/gin"
-	"github.com/joninhasamerico/controle-financeiro-api/internal/controllers/resposta"
+	"github.com/go-playground/validator/v10"
 	"github.com/joninhasamerico/controle-financeiro-api/internal/model"
-	"github.com/joninhasamerico/controle-financeiro-api/internal/repository"
+	"github.com/joninhasamerico/controle-financeiro-api/internal/services"
+	"github.com/sirupsen/logrus"
 )
 
+type ResponseError struct {
+	Message string `json:"message"`
+}
+
+// UsuarioController  represent the httpHandler for article
 type UsuarioController struct {
-	Repo repository.IRepository
+	base     BaseController
+	AUsecase services.IUsuarioService
 }
 
-func (uc UsuarioController) NameGroupRoute() string {
-	return "/usuarios"
+// NewUsuarioController will initialize the usuarios/ resources endpoint
+func NewUsuarioController(e *gin.Engine, us services.IUsuarioService) {
+	handler := &UsuarioController{
+		AUsecase: us,
+	}
+
+	grp1 := e.Group("/v1")
+	{
+		grp1.GET("/usuarios", handler.FetchUsuario)
+		grp1.POST("/usuarios", handler.Store)
+		grp1.GET("/usuarios/:id", handler.GetByID)
+		grp1.DELETE("/usuarios/:id", handler.Delete)
+	}
 }
 
-func (uc UsuarioController) FindAll(c *gin.Context) {
-	var usuarios []model.Usuario
+// FetchUsuario will fetch the article based on given params
+func (a *UsuarioController) FetchUsuario(c *gin.Context) {
+	ctx := a.base.Ctx(c)
 
-	err := uc.Repo.FindAll(&usuarios, "")
+	listAr, err := a.AUsecase.Fetch(ctx)
 	if err != nil {
-		resposta.Erro(c, http.StatusInternalServerError, err)
+		c.JSON(getStatusCode(err), ResponseError{Message: err.Error()})
 		return
 	}
 
-	if len(usuarios) == 0 {
-		resposta.JSON(c, http.StatusNoContent, usuarios)
-		return
-	}
-
-	resposta.JSON(c, http.StatusOK, usuarios)
+	c.JSON(http.StatusOK, listAr)
 }
 
-func (uc UsuarioController) FindById(c *gin.Context) {
-	var usuario model.Usuario
-	id, err := strconv.ParseUint(c.Params.ByName("id"), 10, 64)
+// GetByID will get article by given id
+func (a *UsuarioController) GetByID(c *gin.Context) {
+	idP, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
-		resposta.Erro(c, http.StatusInternalServerError, err)
-		return
+		c.JSON(http.StatusNotFound, model.ErrNotFound.Error())
 	}
 
-	err = uc.Repo.FindById(&usuario, id)
+	id := int64(idP)
+	ctx := a.base.Ctx(c)
+
+	art, err := a.AUsecase.GetByID(ctx, id)
 	if err != nil {
-		resposta.Erro(c, http.StatusInternalServerError, err)
+		c.JSON(getStatusCode(err), ResponseError{Message: err.Error()})
 		return
 	}
 
-	if usuario.ID == 0 {
-		resposta.JSON(c, http.StatusNotFound, errors.New("usuário não encontrado"))
-		return
-	}
-
-	resposta.JSON(c, http.StatusOK, usuario)
+	c.JSON(http.StatusOK, art)
 }
 
-func (uc UsuarioController) Create(c *gin.Context) {
-	var usuario model.Usuario
-
-	if err := c.ShouldBindJSON(&usuario); err != nil {
-		resposta.Erro(c, http.StatusBadRequest, err)
-		return
-	}
-
-	usuarioSalvoNoBanco := model.Usuario{}
-	erro := uc.Repo.FindFirst(&usuarioSalvoNoBanco, "email = ?", usuario.Email)
-	if erro != nil {
-		resposta.Erro(c, http.StatusInternalServerError, erro)
-		return
-	}
-
-	if usuarioSalvoNoBanco.ID != 0 {
-		resposta.Erro(c, http.StatusConflict, errors.New("email informado já está cadastrado"))
-		return
-	}
-
-	_, err := uc.Repo.Save(&usuario)
+func isRequestValid(m *model.Usuario) (bool, error) {
+	validate := validator.New()
+	err := validate.Struct(m)
 	if err != nil {
-		resposta.Erro(c, http.StatusInternalServerError, err)
-		return
+		return false, err
 	}
-
-	resposta.JSON(c, http.StatusOK, usuario.GetUsuarioRetorno())
+	return true, nil
 }
 
-func (uc UsuarioController) Update(c *gin.Context) {
-	var usuario model.Usuario
-	id := c.Params.ByName("id")
-
-	err := uc.Repo.FindById(&usuario, id)
+// Store will store the article by given request body
+func (a *UsuarioController) Store(c *gin.Context) {
+	var article model.Usuario
+	err := c.Bind(&article)
 	if err != nil {
-		resposta.Erro(c, http.StatusInternalServerError, err)
+		c.JSON(http.StatusUnprocessableEntity, err.Error())
 		return
 	}
 
-	if err := c.ShouldBindJSON(&usuario); err != nil {
-		resposta.Erro(c, http.StatusInternalServerError, err)
+	var ok bool
+	if ok, err = isRequestValid(&article); !ok {
+		c.JSON(http.StatusBadRequest, err.Error())
 		return
 	}
 
-	resposta.JSON(c, http.StatusOK, usuario.GetUsuarioRetorno())
+	ctx := a.base.Ctx(c)
+	err = a.AUsecase.Store(ctx, &article)
+	if err != nil {
+		c.JSON(getStatusCode(err), ResponseError{Message: err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusCreated, article)
 }
 
-func (uc UsuarioController) Delete(c *gin.Context) {
-	resposta.BadRequest(c, "Entre em contato com o suporte para solicitar exclusão do usuário desejado")
+// Delete will delete article by given param
+func (a *UsuarioController) Delete(c *gin.Context) {
+	idP, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		c.JSON(http.StatusNotFound, model.ErrNotFound.Error())
+		return
+	}
+
+	id := int64(idP)
+	ctx := a.base.Ctx(c)
+
+	err = a.AUsecase.Delete(ctx, id)
+	if err != nil {
+		c.JSON(getStatusCode(err), ResponseError{Message: err.Error()})
+		return
+	}
+
+	c.AbortWithStatus(http.StatusNoContent)
 }
 
-func (uc UsuarioController) RotaCustomizada(c *gin.Context) {
-	c.JSON(http.StatusOK, gin.H{"message": "Oi, eu sou uma rota customizada!"})
+func getStatusCode(err error) int {
+	if err == nil {
+		return http.StatusOK
+	}
+
+	logrus.Error(err)
+	switch err {
+	case model.ErrInternalServerError:
+		return http.StatusInternalServerError
+	case model.ErrNotFound:
+		return http.StatusNotFound
+	case model.ErrConflict:
+		return http.StatusConflict
+	default:
+		return http.StatusInternalServerError
+	}
 }
