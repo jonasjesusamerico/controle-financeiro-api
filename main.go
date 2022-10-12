@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"log"
+	"strconv"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -30,7 +31,7 @@ func main() {
 	engine := gin.Default()
 	setup(engine, dbCtx)
 
-	log.Fatal(engine.Run())
+	log.Fatal(engine.Run(":" + strconv.Itoa(configs.Porta)))
 }
 
 func setup(engine *gin.Engine, dbCtx *gorm.DB) {
@@ -39,8 +40,8 @@ func setup(engine *gin.Engine, dbCtx *gorm.DB) {
 	/* Middlewares */
 	engine.Use(middlewares.FilterTenantMiddleware())
 
-	/* Article */
-	usuarioRepo := repository.NewUsuarioRepository(dbCtx)
-	usuarioService := services.NewUsuarioService(usuarioRepo, timeoutCtx)
+	/* Usuario */
+	usuarioRepository := repository.NewUsuarioRepository(dbCtx)
+	usuarioService := services.NewUsuarioService(usuarioRepository, timeoutCtx)
 	controllers.NewUsuarioController(engine, usuarioService)
 }

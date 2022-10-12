@@ -17,30 +17,30 @@ type ResponseError struct {
 
 // UsuarioController  represent the httpHandler for article
 type UsuarioController struct {
-	base     BaseController
-	AUsecase services.IUsuarioService
+	super   BaseController
+	service services.IService
 }
 
 // NewUsuarioController will initialize the usuarios/ resources endpoint
-func NewUsuarioController(e *gin.Engine, us services.IUsuarioService) {
+func NewUsuarioController(e *gin.Engine, us services.IService) {
 	handler := &UsuarioController{
-		AUsecase: us,
+		service: us.(*services.UsuarioService),
 	}
 
 	grp1 := e.Group("/v1")
 	{
 		grp1.GET("/usuarios", handler.FetchUsuario)
-		grp1.POST("/usuarios", handler.Store)
+		grp1.POST("/usuarios", handler.Save)
 		grp1.GET("/usuarios/:id", handler.GetByID)
 		grp1.DELETE("/usuarios/:id", handler.Delete)
 	}
 }
 
-// FetchUsuario will fetch the article based on given params
+// FetchUsuario will fetch the article superd on given params
 func (a *UsuarioController) FetchUsuario(c *gin.Context) {
-	ctx := a.base.Ctx(c)
+	ctx := a.super.Ctx(c)
 
-	listAr, err := a.AUsecase.Fetch(ctx)
+	listAr, err := a.service.FindAll(ctx)
 	if err != nil {
 		c.JSON(getStatusCode(err), ResponseError{Message: err.Error()})
 		return
@@ -57,9 +57,9 @@ func (a *UsuarioController) GetByID(c *gin.Context) {
 	}
 
 	id := int64(idP)
-	ctx := a.base.Ctx(c)
+	ctx := a.super.Ctx(c)
 
-	art, err := a.AUsecase.GetByID(ctx, id)
+	art, err := a.service.GetByID(ctx, id)
 	if err != nil {
 		c.JSON(getStatusCode(err), ResponseError{Message: err.Error()})
 		return
@@ -78,7 +78,7 @@ func isRequestValid(m *model.Usuario) (bool, error) {
 }
 
 // Store will store the article by given request body
-func (a *UsuarioController) Store(c *gin.Context) {
+func (a *UsuarioController) Save(c *gin.Context) {
 	var article model.Usuario
 	err := c.Bind(&article)
 	if err != nil {
@@ -92,8 +92,8 @@ func (a *UsuarioController) Store(c *gin.Context) {
 		return
 	}
 
-	ctx := a.base.Ctx(c)
-	err = a.AUsecase.Store(ctx, &article)
+	ctx := a.super.Ctx(c)
+	err = a.service.Save(ctx, &article)
 	if err != nil {
 		c.JSON(getStatusCode(err), ResponseError{Message: err.Error()})
 		return
@@ -111,9 +111,9 @@ func (a *UsuarioController) Delete(c *gin.Context) {
 	}
 
 	id := int64(idP)
-	ctx := a.base.Ctx(c)
+	ctx := a.super.Ctx(c)
 
-	err = a.AUsecase.Delete(ctx, id)
+	err = a.service.Delete(ctx, id)
 	if err != nil {
 		c.JSON(getStatusCode(err), ResponseError{Message: err.Error()})
 		return

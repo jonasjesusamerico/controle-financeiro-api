@@ -4,11 +4,14 @@ services:
   postgres:
     container_name: postgres
     image: postgres
+    restart: always
     volumes:
       - postgres_data:/var/lib/postgresql/data
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
+    networks: 
+      - controle-financeiro-network
     ports: 
       - "5432:5432"
 
@@ -19,15 +22,16 @@ services:
       context: ./
       dockerfile: Dockerfile
     volumes: 
-      - /api-controle-financeiro:/app
+      - /api-controle-financeiro_data:/app
     networks: 
       - controle-financeiro-network
     ports: 
-      - "3000:3000"
+      - "8080:8080"
 
 networks: 
   controle-financeiro-network:
     driver: bridge
 
 volumes:
+  postgres_data:
   api-controle-financeiro_data:
