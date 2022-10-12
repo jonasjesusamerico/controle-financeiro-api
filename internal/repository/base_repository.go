@@ -12,10 +12,10 @@ type BaseRepository struct {
 
 func (b BaseRepository) tenantCtx(ctx context.Context) *gorm.DB {
 	return b.dbCtx.Scopes(func(db *gorm.DB) *gorm.DB {
-		return db.Where("tenant_id = ?", ctx.Value("tenantId"))
+		return db.Where("tenant_id = ?", ctx.Value("tenantId").(int64))
 	})
 }
 
 func (b BaseRepository) TenantID(ctx context.Context) int64 {
-	return int64(ctx.Value("tenantId").(int))
+	return ctx.Value("tenantId").(int64)
 }

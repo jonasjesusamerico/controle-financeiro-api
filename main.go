@@ -34,7 +34,7 @@ func main() {
 }
 
 func setup(engine *gin.Engine, dbCtx *gorm.DB) {
-	timeoutCtx := time.Duration(200) * time.Second
+	timeoutCtx := time.Duration(2) * time.Second
 
 	/* Middlewares */
 	engine.Use(middlewares.FilterTenantMiddleware())

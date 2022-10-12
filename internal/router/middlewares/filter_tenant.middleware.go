@@ -13,7 +13,7 @@ func FilterTenantMiddleware() gin.HandlerFunc {
 		// 	return
 		// }
 
-		c.Set("tenantId", 1)
+		c.Set("tenantId", int64(1))
 		c.Next()
 	}
 }

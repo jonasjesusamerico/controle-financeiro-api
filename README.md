@@ -20,3 +20,4 @@
 - [x] Adicionar router e criar a primeira rota
     - [ ] Padronizar rotas
 - [x] Adicionar arquivo .env 
+- [ ] Implementar autenticação com token jwt
