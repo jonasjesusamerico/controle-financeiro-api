@@ -12,7 +12,7 @@ import (
 	"github.com/joninhasamerico/controle-financeiro-api/configs"
 )
 
-func CriarToken(tenantId uint64, isCustmizavel bool) (tokenNew string, err error) {
+func CriarToken(tenantId uint64) (tokenNew string, err error) {
 	permissoes := jwt.MapClaims{}
 	permissoes["authorized"] = true
 	permissoes["exp"] = time.Now().Add(time.Hour * 6).Unix()

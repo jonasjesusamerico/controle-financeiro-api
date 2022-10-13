@@ -43,6 +43,10 @@ func setup(engine *gin.Engine, dbCtx *gorm.DB) {
 	API_GROUP := MAIN_GROUP.Group("/api", middlewares.MiddleAuth(), middlewares.FilterTenantMiddleware())
 	V1_GROUP := API_GROUP.Group("/v1")
 
+	/* Login */
+	controllers.NewLoginController(MAIN_GROUP, dbCtx)
+
 	/* Usuario */
 	controllers.NewUsuarioController(MAIN_GROUP, V1_GROUP, dbCtx, timeoutCtx)
+
 }

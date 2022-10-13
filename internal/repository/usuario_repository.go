@@ -17,7 +17,7 @@ func NewUsuarioRepository(dbCtx *gorm.DB) IRepository {
 
 func (m *UsuarioRepository) FindAll(ctx context.Context) (res []model.Usuario, err error) {
 	var usuarios []model.Usuario
-	if err = m.base.tenantCtx(ctx).Find(&usuarios).Error; err != nil {
+	if err = m.base.tenantCtx(ctx).Select("id", "email").Find(&usuarios).Error; err != nil {
 		return usuarios, err
 	}
 
