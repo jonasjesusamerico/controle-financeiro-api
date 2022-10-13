@@ -16,7 +16,7 @@ type UsuarioService struct {
 
 func NewUsuarioService(a repository.IRepository, timeout time.Duration) IService {
 	return &UsuarioService{
-		usuarioRepo:    a.(*repository.UsuarioRepository),
+		usuarioRepo:    a,
 		contextTimeout: timeout,
 	}
 }
@@ -45,6 +45,16 @@ func (a *UsuarioService) GetByID(c context.Context, id int64) (usuario model.Usu
 	return
 }
 
+func (a *UsuarioService) GetByEmail(email string) (usuario model.Usuario, err error) {
+	repo := a.usuarioRepo.(*repository.UsuarioRepository)
+	usuario, err = repo.GetByEmail(email)
+	if err != nil {
+		return
+	}
+
+	return
+}
+
 func (a *UsuarioService) Update(c context.Context, ar *model.Usuario) (err error) {
 	ctx, cancel := context.WithTimeout(c, a.contextTimeout)
 	defer cancel()
@@ -60,8 +70,19 @@ func (a *UsuarioService) Save(c context.Context, m *model.Usuario) (err error) {
 	if existedUsuario != (model.Usuario{}) {
 		return model.ErrConflict
 	}
-
+	m.Validar()
 	err = a.usuarioRepo.Save(ctx, m)
+	return
+}
+
+func (a *UsuarioService) CreateUserLogin(m *model.Usuario) (err error) {
+	repo := a.usuarioRepo.(*repository.UsuarioRepository)
+	existedUsuario, _ := a.GetByEmail(m.Email)
+	if existedUsuario != (model.Usuario{}) {
+		return model.ErrConflict
+	}
+	m.Validar()
+	err = repo.CreateUserLogin(m)
 	return
 }
 

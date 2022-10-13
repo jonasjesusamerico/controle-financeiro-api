@@ -36,13 +36,13 @@ func setup(engine *gin.Engine, dbCtx *gorm.DB) {
 	timeoutCtx := time.Duration(2) * time.Second
 
 	/* Middlewares */
-	engine.Use(middlewares.FilterTenantMiddleware())
+	// engine.Use()
 
 	/* Groups */
 	MAIN_GROUP := engine.Group("/")
-	API_GROUP := MAIN_GROUP.Group("/api")
+	API_GROUP := MAIN_GROUP.Group("/api", middlewares.MiddleAuth(), middlewares.FilterTenantMiddleware())
 	V1_GROUP := API_GROUP.Group("/v1")
 
 	/* Usuario */
-	controllers.NewUsuarioController(V1_GROUP, dbCtx, timeoutCtx)
+	controllers.NewUsuarioController(MAIN_GROUP, V1_GROUP, dbCtx, timeoutCtx)
 }

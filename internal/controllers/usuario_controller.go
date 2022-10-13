@@ -24,7 +24,7 @@ type UsuarioController struct {
 	service services.IService
 }
 
-func NewUsuarioController(e *gin.RouterGroup, dbCtx *gorm.DB, timeoutCtx time.Duration) {
+func NewUsuarioController(rotaMain *gin.RouterGroup, rotaV1 *gin.RouterGroup, dbCtx *gorm.DB, timeoutCtx time.Duration) {
 
 	usuarioRepository := repository.NewUsuarioRepository(dbCtx)
 	usuarioService := services.NewUsuarioService(usuarioRepository, timeoutCtx)
@@ -34,10 +34,10 @@ func NewUsuarioController(e *gin.RouterGroup, dbCtx *gorm.DB, timeoutCtx time.Du
 	}
 
 	{
-		e.GET("/usuarios", handler.FetchUsuario)
-		e.POST("/usuarios", handler.Save)
-		e.GET("/usuarios/:id", handler.GetByID)
-		e.DELETE("/usuarios/:id", handler.Delete)
+		rotaMain.POST("/usuarios", handler.CreateUserLogin)
+		rotaV1.GET("/usuarios", handler.FetchUsuario)
+		rotaV1.GET("/usuarios/:id", handler.GetByID)
+		rotaV1.DELETE("/usuarios/:id", handler.Delete)
 	}
 }
 
@@ -81,29 +81,54 @@ func isRequestValid(m *model.Usuario) (bool, error) {
 	return true, nil
 }
 
-// Store will store the article by given request body
+// Store will store the usuario by given request body
 func (a *UsuarioController) Save(c *gin.Context) {
-	var article model.Usuario
-	err := c.Bind(&article)
+	var usuario model.Usuario
+	err := c.Bind(&usuario)
 	if err != nil {
 		c.JSON(http.StatusUnprocessableEntity, err.Error())
 		return
 	}
 
 	var ok bool
-	if ok, err = isRequestValid(&article); !ok {
+	if ok, err = isRequestValid(&usuario); !ok {
 		c.JSON(http.StatusBadRequest, err.Error())
 		return
 	}
 
 	ctx := a.super.Ctx(c)
-	err = a.service.Save(ctx, &article)
+	err = a.service.Save(ctx, &usuario)
 	if err != nil {
 		c.JSON(getStatusCode(err), ResponseError{Message: err.Error()})
 		return
 	}
 
-	c.JSON(http.StatusCreated, article)
+	c.JSON(http.StatusCreated, usuario.GetUsuarioRetorno())
+}
+
+// Store will store the usuario by given request body
+func (a *UsuarioController) CreateUserLogin(c *gin.Context) {
+	var usuario model.Usuario
+	err := c.Bind(&usuario)
+	if err != nil {
+		c.JSON(http.StatusUnprocessableEntity, err.Error())
+		return
+	}
+
+	var ok bool
+	if ok, err = isRequestValid(&usuario); !ok {
+		c.JSON(http.StatusBadRequest, err.Error())
+		return
+	}
+
+	service := a.service.(*services.UsuarioService)
+	err = service.CreateUserLogin(&usuario)
+	if err != nil {
+		c.JSON(getStatusCode(err), ResponseError{Message: err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusCreated, usuario.GetUsuarioRetorno())
 }
 
 // Delete will delete article by given param

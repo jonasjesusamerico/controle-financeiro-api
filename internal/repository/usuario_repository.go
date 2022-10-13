@@ -23,9 +23,19 @@ func (m *UsuarioRepository) FindAll(ctx context.Context) (res []model.Usuario, e
 
 	return usuarios, nil
 }
+
 func (m *UsuarioRepository) GetByID(ctx context.Context, id int64) (model.Usuario, error) {
 	var usuario model.Usuario
 	if err := m.base.tenantCtx(ctx).Where("id = ?", id).First(&usuario).Error; err != nil {
+		return usuario, err
+	}
+
+	return usuario, nil
+}
+
+func (m *UsuarioRepository) GetByEmail(email string) (model.Usuario, error) {
+	var usuario model.Usuario
+	if err := m.base.dbCtx.Where("email = ?", email).First(&usuario).Error; err != nil {
 		return usuario, err
 	}
 
@@ -36,6 +46,13 @@ func (m *UsuarioRepository) Save(ctx context.Context, usuario *model.Usuario) (e
 	usuario.TenantID = m.base.TenantID(ctx)
 
 	if err = m.base.tenantCtx(ctx).Create(usuario).Error; err != nil {
+		return err
+	}
+	return nil
+}
+
+func (m *UsuarioRepository) CreateUserLogin(usuario *model.Usuario) (err error) {
+	if err = m.base.dbCtx.Create(usuario).Error; err != nil {
 		return err
 	}
 	return nil
