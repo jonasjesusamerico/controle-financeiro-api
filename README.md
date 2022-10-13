@@ -22,6 +22,6 @@
 - [x] Configura o banco de dados Postgres
 - [ ] ~~Verificar opção de migration para versionamento do sql~~ (Criar novo projeto apenas para executar as migrations)
 - [x] Adicionar router e criar a primeira rota
-    - [ ] Padronizar rotas
+    - [x] Padronizar rotas
 - [x] Adicionar arquivo .env 
-- [ ] Implementar autenticação com token jwt
+- [x] Implementar autenticação com token jwt
