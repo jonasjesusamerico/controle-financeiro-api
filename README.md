@@ -25,3 +25,4 @@
     - [x] Padronizar rotas
 - [x] Adicionar arquivo .env 
 - [x] Implementar autenticação com token jwt
+- [x] Criar rota login para autenticação
