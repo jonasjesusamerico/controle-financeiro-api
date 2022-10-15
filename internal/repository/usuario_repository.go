@@ -11,7 +11,7 @@ type UsuarioRepository struct {
 	base BaseRepository
 }
 
-func NewUsuarioRepository(dbCtx *gorm.DB) IRepository {
+func NewUsuarioRepository(dbCtx *gorm.DB) *UsuarioRepository {
 	return &UsuarioRepository{base: BaseRepository{dbCtx: dbCtx}}
 }
 
