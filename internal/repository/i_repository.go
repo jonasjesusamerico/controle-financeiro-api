@@ -7,9 +7,9 @@ import (
 )
 
 type IRepository interface {
-	FindAll(ctx context.Context) (res []model.Usuario, err error)
-	GetByID(ctx context.Context, id int64) (model.Usuario, error)
-	Update(ctx context.Context, ar *model.Usuario) error
-	Save(ctx context.Context, a *model.Usuario) error
-	Delete(ctx context.Context, id int64) error
+	FindAll(ctx context.Context, models interface{}) (err error)
+	GetByID(ctx context.Context, model model.IModel, id int64) (err error)
+	Update(ctx context.Context, model model.IModel) (err error)
+	Save(ctx context.Context, model model.IModel) (err error)
+	Delete(ctx context.Context, model model.IModel, id int64) (err error)
 }

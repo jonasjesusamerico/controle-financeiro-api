@@ -34,7 +34,7 @@ func NewUsuarioController(rotaMain *gin.RouterGroup, rotaV1 *gin.RouterGroup, db
 	}
 
 	{
-		rotaMain.POST("/usuarios", handler.CreateUserLogin)
+		rotaMain.POST("/usuarios", handler.Save)
 		rotaV1.GET("/usuarios", handler.FetchUsuario)
 		rotaV1.GET("/usuarios/:id", handler.GetByID)
 		rotaV1.DELETE("/usuarios/:id", handler.Delete)
@@ -45,13 +45,15 @@ func NewUsuarioController(rotaMain *gin.RouterGroup, rotaV1 *gin.RouterGroup, db
 func (a *UsuarioController) FetchUsuario(c *gin.Context) {
 	ctx := a.super.Ctx(c)
 
-	listAr, err := a.service.FindAll(ctx)
+	var usuarios []model.Usuario
+
+	err := a.service.FindAll(ctx, &usuarios)
 	if err != nil {
 		c.JSON(getStatusCode(err), ResponseError{Message: err.Error()})
 		return
 	}
 
-	c.JSON(http.StatusOK, listAr)
+	c.JSON(http.StatusOK, usuarios)
 }
 
 func (a *UsuarioController) GetByID(c *gin.Context) {
@@ -63,13 +65,15 @@ func (a *UsuarioController) GetByID(c *gin.Context) {
 	id := int64(idP)
 	ctx := a.super.Ctx(c)
 
-	art, err := a.service.GetByID(ctx, id)
+	usuario := model.Usuario{}
+
+	err = a.service.GetByID(ctx, &usuario, id)
 	if err != nil {
 		c.JSON(getStatusCode(err), ResponseError{Message: err.Error()})
 		return
 	}
 
-	c.JSON(http.StatusOK, art)
+	c.JSON(http.StatusOK, usuario)
 }
 
 func isRequestValid(m *model.Usuario) (bool, error) {
@@ -81,7 +85,6 @@ func isRequestValid(m *model.Usuario) (bool, error) {
 	return true, nil
 }
 
-// Store will store the usuario by given request body
 func (a *UsuarioController) Save(c *gin.Context) {
 	var usuario model.Usuario
 	err := c.Bind(&usuario)
@@ -96,33 +99,8 @@ func (a *UsuarioController) Save(c *gin.Context) {
 		return
 	}
 
-	ctx := a.super.Ctx(c)
-	err = a.service.Save(ctx, &usuario)
-	if err != nil {
-		c.JSON(getStatusCode(err), ResponseError{Message: err.Error()})
-		return
-	}
-
-	c.JSON(http.StatusCreated, usuario.GetUsuarioRetorno())
-}
-
-// Store will store the usuario by given request body
-func (a *UsuarioController) CreateUserLogin(c *gin.Context) {
-	var usuario model.Usuario
-	err := c.Bind(&usuario)
-	if err != nil {
-		c.JSON(http.StatusUnprocessableEntity, err.Error())
-		return
-	}
-
-	var ok bool
-	if ok, err = isRequestValid(&usuario); !ok {
-		c.JSON(http.StatusBadRequest, err.Error())
-		return
-	}
-
 	service := a.service.(*services.UsuarioService)
-	err = service.CreateUserLogin(&usuario)
+	err = service.Save(nil, &usuario)
 	if err != nil {
 		c.JSON(getStatusCode(err), ResponseError{Message: err.Error()})
 		return
@@ -131,7 +109,6 @@ func (a *UsuarioController) CreateUserLogin(c *gin.Context) {
 	c.JSON(http.StatusCreated, usuario.GetUsuarioRetorno())
 }
 
-// Delete will delete article by given param
 func (a *UsuarioController) Delete(c *gin.Context) {
 	idP, err := strconv.Atoi(c.Param("id"))
 	if err != nil {

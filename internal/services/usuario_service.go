@@ -21,33 +21,23 @@ func NewUsuarioService(a repository.IRepository, timeout time.Duration) IService
 	}
 }
 
-func (a *UsuarioService) FindAll(c context.Context) (res []model.Usuario, err error) {
-	ctx, cancel := context.WithTimeout(c, a.contextTimeout)
+func (a *UsuarioService) FindAll(ctx context.Context, models interface{}) (err error) {
+	ctx, cancel := context.WithTimeout(ctx, a.contextTimeout)
 	defer cancel()
 
-	res, err = a.usuarioRepo.FindAll(ctx)
+	err = a.usuarioRepo.FindAll(ctx, models)
 	if err != nil {
-		return nil, err
+		return err
 	}
 
 	return
 }
 
-func (a *UsuarioService) GetByID(c context.Context, id int64) (usuario model.Usuario, err error) {
-	ctx, cancel := context.WithTimeout(c, a.contextTimeout)
+func (a *UsuarioService) GetByID(ctx context.Context, model model.IModel, id int64) (err error) {
+	ctx, cancel := context.WithTimeout(ctx, a.contextTimeout)
 	defer cancel()
 
-	usuario, err = a.usuarioRepo.GetByID(ctx, id)
-	if err != nil {
-		return
-	}
-
-	return
-}
-
-func (a *UsuarioService) GetByEmail(email string) (usuario model.Usuario, err error) {
-	repo := a.usuarioRepo.(*repository.UsuarioRepository)
-	usuario, err = repo.GetByEmail(email)
+	err = a.usuarioRepo.GetByID(ctx, model, id)
 	if err != nil {
 		return
 	}
@@ -55,48 +45,48 @@ func (a *UsuarioService) GetByEmail(email string) (usuario model.Usuario, err er
 	return
 }
 
-func (a *UsuarioService) Update(c context.Context, ar *model.Usuario) (err error) {
-	ctx, cancel := context.WithTimeout(c, a.contextTimeout)
+func (a *UsuarioService) Update(ctx context.Context, model model.IModel) (err error) {
+	ctx, cancel := context.WithTimeout(ctx, a.contextTimeout)
 	defer cancel()
 
-	ar.UpdatedAt = time.Now()
-	return a.usuarioRepo.Update(ctx, ar)
+	return a.usuarioRepo.Update(ctx, model)
 }
 
-func (a *UsuarioService) Save(c context.Context, m *model.Usuario) (err error) {
-	ctx, cancel := context.WithTimeout(c, a.contextTimeout)
-	defer cancel()
-	existedUsuario, _ := a.GetByID(ctx, int64(m.ID))
-	if existedUsuario != (model.Usuario{}) {
-		return model.ErrConflict
-	}
-	m.Validar()
-	err = a.usuarioRepo.Save(ctx, m)
-	return
-}
-
-func (a *UsuarioService) CreateUserLogin(m *model.Usuario) (err error) {
+func (a *UsuarioService) Save(ctx context.Context, models model.IModel) (err error) {
+	usuario := models.(*model.Usuario)
 	repo := a.usuarioRepo.(*repository.UsuarioRepository)
-	existedUsuario, _ := a.GetByEmail(m.Email)
+	existedUsuario, _ := a.GetByEmail(usuario.Email)
 	if existedUsuario != (model.Usuario{}) {
 		return model.ErrConflict
 	}
-	m.Validar()
-	err = repo.CreateUserLogin(m)
+	usuario.Validar()
+	err = repo.CreateUserLogin(usuario)
 	return
 }
 
-func (a *UsuarioService) Delete(c context.Context, id int64) (err error) {
-	ctx, cancel := context.WithTimeout(c, a.contextTimeout)
+func (a *UsuarioService) Delete(ctx context.Context, id int64) (err error) {
+	ctx, cancel := context.WithTimeout(ctx, a.contextTimeout)
 	defer cancel()
-	existedUsuario, err := a.usuarioRepo.GetByID(ctx, id)
+	existedUsuario := model.Usuario{}
+	err = a.usuarioRepo.GetByID(ctx, &existedUsuario, id)
 	if err != nil {
 		return
 	}
 	if existedUsuario == (model.Usuario{}) {
 		return model.ErrNotFound
 	}
-	return a.usuarioRepo.Delete(ctx, id)
+	return a.usuarioRepo.Delete(ctx, existedUsuario, id)
+}
+
+func (a *UsuarioService) GetByEmail(email string) (usuario model.IModel, err error) {
+	repo := a.usuarioRepo.(*repository.UsuarioRepository)
+	var u model.Usuario
+	err = repo.GetByEmail(email, &u)
+	if err != nil {
+		return nil, err
+	}
+
+	return u, nil
 }
 
 func (a *UsuarioService) Teste() {

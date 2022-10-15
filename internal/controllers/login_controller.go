@@ -42,7 +42,8 @@ func (lc LoginController) Login(c *gin.Context) {
 	}
 
 	usuarioRepo := lc.Repo.(*repository.UsuarioRepository)
-	usuarioSalvoNoBanco, err := usuarioRepo.GetByEmail(usuario.Email)
+	usuarioSalvoNoBanco := model.Usuario{}
+	err := usuarioRepo.GetByEmail(usuario.Email, &usuarioSalvoNoBanco)
 	if err != nil {
 		resposta.Erro(c, http.StatusInternalServerError, err)
 		return
