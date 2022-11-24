@@ -36,7 +36,7 @@ func setup(engine *gin.Engine, dbCtx *gorm.DB) {
 	timeoutCtx := time.Duration(2) * time.Second
 
 	/* Middlewares */
-	// engine.Use()
+	engine.Use(middlewares.CORSMiddleware())
 
 	/* Groups */
 	MAIN_GROUP := engine.Group("/")

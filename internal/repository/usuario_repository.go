@@ -56,7 +56,7 @@ func (m *UsuarioRepository) Delete(ctx context.Context, model model.IModel, id i
 func (m *UsuarioRepository) GetByEmail(email string, usuario model.IModel) (err error) {
 
 	if err := m.base.dbCtx.Where("email = ?", email).First(&usuario).Error; err != nil {
-		return err
+		return model.ErrNotFound
 	}
 
 	return nil

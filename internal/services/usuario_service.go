@@ -56,7 +56,7 @@ func (a *UsuarioService) Save(ctx context.Context, models model.IModel) (err err
 	usuario := models.(*model.Usuario)
 	repo := a.usuarioRepo.(*repository.UsuarioRepository)
 	existedUsuario, _ := a.GetByEmail(usuario.Email)
-	if existedUsuario != (model.Usuario{}) {
+	if existedUsuario.GetId() != 0 {
 		return model.ErrConflict
 	}
 	usuario.Validar()
