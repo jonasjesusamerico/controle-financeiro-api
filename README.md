@@ -7,7 +7,6 @@
 * Aplição tem como objetivo aplicar os conhecimento adquirido ao longo do tempo com a linguagem GOlang.
 
 ## TECNOLOGIAS
-[PostgreSQL](https://www.postgresql.org/)
 * Desenvolvimento
     * [GOlang](https://go.dev/) - Liguagem para desenvolvimento
     * [Gin-Gonic](https://gin-gonic.com/docs/) - Lib responsável pelo controle de rota da aplicação
