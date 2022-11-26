@@ -10,13 +10,13 @@ import (
 )
 
 type UsuarioService struct {
-	usuarioRepo    repository.IRepository
+	usuarioRepo    repository.UsuarioRepository
 	contextTimeout time.Duration
 }
 
-func NewUsuarioService(a repository.IRepository, timeout time.Duration) IService {
+func NewUsuarioService(a *repository.UsuarioRepository, timeout time.Duration) *UsuarioService {
 	return &UsuarioService{
-		usuarioRepo:    a,
+		usuarioRepo:    *a,
 		contextTimeout: timeout,
 	}
 }
@@ -54,13 +54,12 @@ func (a *UsuarioService) Update(ctx context.Context, model model.IModel) (err er
 
 func (a *UsuarioService) Save(ctx context.Context, models model.IModel) (err error) {
 	usuario := models.(*model.Usuario)
-	repo := a.usuarioRepo.(*repository.UsuarioRepository)
 	existedUsuario, _ := a.GetByEmail(usuario.Email)
 	if existedUsuario.GetId() != 0 {
 		return model.ErrConflict
 	}
 	usuario.Validar()
-	err = repo.CreateUserLogin(usuario)
+	err = a.usuarioRepo.CreateUserLogin(usuario)
 	return
 }
 
@@ -79,9 +78,8 @@ func (a *UsuarioService) Delete(ctx context.Context, id int64) (err error) {
 }
 
 func (a *UsuarioService) GetByEmail(email string) (usuario model.IModel, err error) {
-	repo := a.usuarioRepo.(*repository.UsuarioRepository)
 	var u model.Usuario
-	err = repo.GetByEmail(email, &u)
+	err = a.usuarioRepo.GetByEmail(email, &u)
 	if err != nil {
 		return nil, err
 	}

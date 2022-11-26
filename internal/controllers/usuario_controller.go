@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"context"
 	"net/http"
 	"strconv"
 	"time"
@@ -21,7 +22,7 @@ type ResponseError struct {
 // UsuarioController  represent the httpHandler for article
 type UsuarioController struct {
 	super   BaseController
-	service services.IService
+	service services.UsuarioService
 }
 
 func NewUsuarioController(rotaMain *gin.RouterGroup, rotaV1 *gin.RouterGroup, dbCtx *gorm.DB, timeoutCtx time.Duration) {
@@ -30,7 +31,7 @@ func NewUsuarioController(rotaMain *gin.RouterGroup, rotaV1 *gin.RouterGroup, db
 	usuarioService := services.NewUsuarioService(usuarioRepository, timeoutCtx)
 
 	handler := &UsuarioController{
-		service: usuarioService,
+		service: *usuarioService,
 	}
 
 	{
@@ -99,8 +100,7 @@ func (a *UsuarioController) Save(c *gin.Context) {
 		return
 	}
 
-	service := a.service.(*services.UsuarioService)
-	err = service.Save(nil, &usuario)
+	err = a.service.Save(context.TODO(), &usuario)
 	if err != nil {
 		c.JSON(getStatusCode(err), ResponseError{Message: err.Error()})
 		return
