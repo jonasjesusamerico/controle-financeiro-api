@@ -10,13 +10,13 @@ import (
 )
 
 type UsuarioService struct {
-	usuarioRepo    repository.UsuarioRepository
+	usuarioRepo    repository.IUsuarioRepository
 	contextTimeout time.Duration
 }
 
-func NewUsuarioService(a *repository.UsuarioRepository, timeout time.Duration) *UsuarioService {
+func NewUsuarioService(a repository.IUsuarioRepository, timeout time.Duration) IUsuarioService {
 	return &UsuarioService{
-		usuarioRepo:    *a,
+		usuarioRepo:    a,
 		contextTimeout: timeout,
 	}
 }

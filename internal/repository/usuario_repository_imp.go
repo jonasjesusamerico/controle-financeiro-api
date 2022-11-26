@@ -11,8 +11,12 @@ type UsuarioRepository struct {
 	base BaseRepository
 }
 
-func NewUsuarioRepository(dbCtx *gorm.DB) *UsuarioRepository {
-	return &UsuarioRepository{base: BaseRepository{dbCtx: dbCtx}}
+func NewUsuarioRepository(dbCtx *gorm.DB) IUsuarioRepository {
+	return &UsuarioRepository{
+		base: BaseRepository{
+			dbCtx: dbCtx,
+		},
+	}
 }
 
 func (m *UsuarioRepository) FindAll(ctx context.Context, models interface{}) (err error) {

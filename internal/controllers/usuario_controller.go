@@ -7,11 +7,9 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
-	"github.com/go-playground/validator/v10"
 	"github.com/joninhasamerico/controle-financeiro-api/internal/model"
 	"github.com/joninhasamerico/controle-financeiro-api/internal/repository"
 	"github.com/joninhasamerico/controle-financeiro-api/internal/services"
-	"github.com/sirupsen/logrus"
 	"gorm.io/gorm"
 )
 
@@ -22,7 +20,7 @@ type ResponseError struct {
 // UsuarioController  represent the httpHandler for article
 type UsuarioController struct {
 	super   BaseController
-	service services.UsuarioService
+	service services.IUsuarioService
 }
 
 func NewUsuarioController(rotaMain *gin.RouterGroup, rotaV1 *gin.RouterGroup, dbCtx *gorm.DB, timeoutCtx time.Duration) {
@@ -31,7 +29,7 @@ func NewUsuarioController(rotaMain *gin.RouterGroup, rotaV1 *gin.RouterGroup, db
 	usuarioService := services.NewUsuarioService(usuarioRepository, timeoutCtx)
 
 	handler := &UsuarioController{
-		service: *usuarioService,
+		service: usuarioService,
 	}
 
 	{
@@ -77,15 +75,6 @@ func (a *UsuarioController) GetByID(c *gin.Context) {
 	c.JSON(http.StatusOK, usuario)
 }
 
-func isRequestValid(m *model.Usuario) (bool, error) {
-	validate := validator.New()
-	err := validate.Struct(m)
-	if err != nil {
-		return false, err
-	}
-	return true, nil
-}
-
 func (a *UsuarioController) Save(c *gin.Context) {
 	var usuario model.Usuario
 	err := c.Bind(&usuario)
@@ -95,7 +84,7 @@ func (a *UsuarioController) Save(c *gin.Context) {
 	}
 
 	var ok bool
-	if ok, err = isRequestValid(&usuario); !ok {
+	if ok, err = IsRequestValid(&usuario); !ok {
 		c.JSON(http.StatusBadRequest, err.Error())
 		return
 	}
@@ -126,22 +115,4 @@ func (a *UsuarioController) Delete(c *gin.Context) {
 	}
 
 	c.AbortWithStatus(http.StatusNoContent)
-}
-
-func getStatusCode(err error) int {
-	if err == nil {
-		return http.StatusOK
-	}
-
-	logrus.Error(err)
-	switch err {
-	case model.ErrInternalServerError:
-		return http.StatusInternalServerError
-	case model.ErrNotFound:
-		return http.StatusNotFound
-	case model.ErrConflict:
-		return http.StatusConflict
-	default:
-		return http.StatusInternalServerError
-	}
 }

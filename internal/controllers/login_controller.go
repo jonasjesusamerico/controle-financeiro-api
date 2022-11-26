@@ -13,7 +13,7 @@ import (
 )
 
 type LoginController struct {
-	Repo repository.IRepository
+	Repo repository.IUsuarioRepository
 }
 
 func NewLoginController(rotaMain *gin.RouterGroup, dbCtx *gorm.DB) {
@@ -41,9 +41,8 @@ func (lc LoginController) Login(c *gin.Context) {
 		return
 	}
 
-	usuarioRepo := lc.Repo.(*repository.UsuarioRepository)
 	usuarioSalvoNoBanco := model.Usuario{}
-	err := usuarioRepo.GetByEmail(usuario.Email, &usuarioSalvoNoBanco)
+	err := lc.Repo.GetByEmail(usuario.Email, &usuarioSalvoNoBanco)
 	if err != nil {
 		resposta.Erro(c, http.StatusInternalServerError, err)
 		return
