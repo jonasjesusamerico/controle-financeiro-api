@@ -18,7 +18,6 @@ type ResponseError struct {
 	Message string `json:"message"`
 }
 
-// UsuarioController  represent the httpHandler for article
 type UsuarioController struct {
 	BaseController
 	service services.IUsuarioService
@@ -41,7 +40,6 @@ func NewUsuarioController(rotaMain *gin.RouterGroup, rotaV1 *gin.RouterGroup, db
 	}
 }
 
-// FetchUsuario will fetch the article superd on given params
 func (a *UsuarioController) FetchUsuario(c *gin.Context) {
 	ctx := a.Ctx(c)
 
