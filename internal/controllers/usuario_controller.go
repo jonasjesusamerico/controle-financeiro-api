@@ -20,7 +20,7 @@ type ResponseError struct {
 
 // UsuarioController  represent the httpHandler for article
 type UsuarioController struct {
-	super   BaseController
+	BaseController
 	service services.IUsuarioService
 }
 
@@ -43,7 +43,7 @@ func NewUsuarioController(rotaMain *gin.RouterGroup, rotaV1 *gin.RouterGroup, db
 
 // FetchUsuario will fetch the article superd on given params
 func (a *UsuarioController) FetchUsuario(c *gin.Context) {
-	ctx := a.super.Ctx(c)
+	ctx := a.Ctx(c)
 
 	var usuarios []model.Usuario
 
@@ -66,7 +66,7 @@ func (a *UsuarioController) GetByID(c *gin.Context) {
 	}
 
 	id := int64(idP)
-	ctx := a.super.Ctx(c)
+	ctx := a.Ctx(c)
 
 	usuario := model.Usuario{}
 
@@ -108,7 +108,7 @@ func (a *UsuarioController) Delete(c *gin.Context) {
 	}
 
 	id := int64(idP)
-	ctx := a.super.Ctx(c)
+	ctx := a.Ctx(c)
 
 	err = a.service.Delete(ctx, id)
 	if err != nil {
