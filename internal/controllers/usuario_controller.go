@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
+	"github.com/joninhasamerico/controle-financeiro-api/internal/controllers/rest_err"
 	"github.com/joninhasamerico/controle-financeiro-api/internal/model"
 	"github.com/joninhasamerico/controle-financeiro-api/internal/repository"
 	"github.com/joninhasamerico/controle-financeiro-api/internal/services"
@@ -48,7 +49,8 @@ func (a *UsuarioController) FetchUsuario(c *gin.Context) {
 
 	err := a.service.FindAll(ctx, &usuarios)
 	if err != nil {
-		c.JSON(getStatusCode(err), ResponseError{Message: err.Error()})
+		errRest := rest_err.NewNotFoundError(err.Error())
+		c.JSON(errRest.Code, errRest)
 		return
 	}
 
@@ -58,7 +60,9 @@ func (a *UsuarioController) FetchUsuario(c *gin.Context) {
 func (a *UsuarioController) GetByID(c *gin.Context) {
 	idP, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
-		c.JSON(http.StatusNotFound, model.ErrNotFound.Error())
+		errRest := rest_err.NewInternalServerError(err.Error())
+		c.JSON(errRest.Code, errRest)
+		return
 	}
 
 	id := int64(idP)
@@ -68,7 +72,8 @@ func (a *UsuarioController) GetByID(c *gin.Context) {
 
 	err = a.service.GetByID(ctx, &usuario, id)
 	if err != nil {
-		c.JSON(getStatusCode(err), ResponseError{Message: err.Error()})
+		errRest := rest_err.NewNotFoundError(err.Error())
+		c.JSON(errRest.Code, errRest)
 		return
 	}
 
@@ -77,21 +82,17 @@ func (a *UsuarioController) GetByID(c *gin.Context) {
 
 func (a *UsuarioController) Save(c *gin.Context) {
 	var usuario model.Usuario
-	err := c.Bind(&usuario)
+	err := c.ShouldBindJSON(&usuario)
 	if err != nil {
-		c.JSON(http.StatusUnprocessableEntity, err.Error())
-		return
-	}
-
-	var ok bool
-	if ok, err = IsRequestValid(&usuario); !ok {
-		c.JSON(http.StatusBadRequest, err.Error())
+		errRest := rest_err.NewUnprocessableEntityError(err.Error())
+		c.JSON(errRest.Code, errRest)
 		return
 	}
 
 	err = a.service.Save(context.TODO(), &usuario)
 	if err != nil {
-		c.JSON(getStatusCode(err), ResponseError{Message: err.Error()})
+		errRest := rest_err.NewInternalServerError(err.Error())
+		c.JSON(errRest.Code, errRest)
 		return
 	}
 
@@ -101,7 +102,8 @@ func (a *UsuarioController) Save(c *gin.Context) {
 func (a *UsuarioController) Delete(c *gin.Context) {
 	idP, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
-		c.JSON(http.StatusNotFound, model.ErrNotFound.Error())
+		errRest := rest_err.NewNotFoundError(err.Error())
+		c.JSON(errRest.Code, errRest)
 		return
 	}
 
@@ -110,7 +112,8 @@ func (a *UsuarioController) Delete(c *gin.Context) {
 
 	err = a.service.Delete(ctx, id)
 	if err != nil {
-		c.JSON(getStatusCode(err), ResponseError{Message: err.Error()})
+		errRest := rest_err.NewInternalServerError(err.Error())
+		c.JSON(errRest.Code, errRest)
 		return
 	}
 

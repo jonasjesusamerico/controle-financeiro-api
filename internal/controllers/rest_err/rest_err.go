@@ -67,3 +67,11 @@ func NewForbiddenError(message string) *RestErr {
 		Code:    http.StatusForbidden,
 	}
 }
+
+func NewUnprocessableEntityError(message string) *RestErr {
+	return &RestErr{
+		Message: message,
+		Err:     "unprocessable_entity",
+		Code:    http.StatusForbidden,
+	}
+}
