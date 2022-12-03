@@ -5,7 +5,7 @@ import (
 	"strconv"
 
 	"github.com/gin-gonic/gin"
-	"github.com/joninhasamerico/controle-financeiro-api/internal/controllers/resposta"
+	"github.com/joninhasamerico/controle-financeiro-api/internal/controllers/rest_err"
 	"github.com/joninhasamerico/controle-financeiro-api/internal/model"
 	"github.com/joninhasamerico/controle-financeiro-api/internal/repository"
 	"github.com/joninhasamerico/controle-financeiro-api/pkg/auth"
@@ -37,25 +37,25 @@ func (lc LoginController) Login(c *gin.Context) {
 	var usuario model.Usuario
 
 	if err := c.ShouldBindJSON(&usuario); err != nil {
-		resposta.Erro(c, http.StatusBadRequest, err)
+		rest_err.NewBadRequestError(err.Error())
 		return
 	}
 
 	usuarioSalvoNoBanco := model.Usuario{}
 	err := lc.Repo.GetByEmail(usuario.Email, &usuarioSalvoNoBanco)
 	if err != nil {
-		resposta.Erro(c, http.StatusInternalServerError, err)
+		rest_err.NewNotFoundError("Your email was not found")
 		return
 	}
 
 	if err = auth.VerificarSenha(usuarioSalvoNoBanco.Senha, usuario.Senha); err != nil {
-		resposta.Erro(c, http.StatusUnauthorized, err)
+		rest_err.NewForbiddenError(err.Error())
 		return
 	}
 
 	token, erro := auth.CriarToken(usuarioSalvoNoBanco.ID)
 	if erro != nil {
-		resposta.Erro(c, http.StatusInternalServerError, erro)
+		rest_err.NewInternalServerError(erro.Error())
 		return
 	}
 
