@@ -3,6 +3,7 @@ package repository
 import (
 	"context"
 
+	"github.com/joninhasamerico/controle-financeiro-api/internal/model/enum"
 	"gorm.io/gorm"
 )
 
@@ -17,5 +18,5 @@ func (b BaseRepository) tenantCtx(ctx context.Context) *gorm.DB {
 }
 
 func (b BaseRepository) TenantID(ctx context.Context) int64 {
-	return ctx.Value("tenantId").(int64)
+	return ctx.Value(enum.TENANT_ID).(int64)
 }

@@ -37,25 +37,29 @@ func (lc LoginController) Login(c *gin.Context) {
 	var usuario model.Usuario
 
 	if err := c.ShouldBindJSON(&usuario); err != nil {
-		rest_err.NewBadRequestError(err.Error())
+		errRest := rest_err.NewBadRequestError(err.Error())
+		c.JSON(errRest.Code, errRest)
 		return
 	}
 
 	usuarioSalvoNoBanco := model.Usuario{}
 	err := lc.Repo.GetByEmail(usuario.Email, &usuarioSalvoNoBanco)
 	if err != nil {
-		rest_err.NewNotFoundError("Your email was not found")
+		errRest := rest_err.NewNotFoundError("The email entered is not a valid email")
+		c.JSON(errRest.Code, errRest)
 		return
 	}
 
 	if err = auth.VerificarSenha(usuarioSalvoNoBanco.Senha, usuario.Senha); err != nil {
-		rest_err.NewForbiddenError(err.Error())
+		errRest := rest_err.NewForbiddenError(err.Error())
+		c.JSON(errRest.Code, errRest)
 		return
 	}
 
 	token, erro := auth.CriarToken(usuarioSalvoNoBanco.ID)
 	if erro != nil {
-		rest_err.NewInternalServerError(erro.Error())
+		errRest := rest_err.NewInternalServerError(erro.Error())
+		c.JSON(errRest.Code, errRest)
 		return
 	}
 
