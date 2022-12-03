@@ -8,12 +8,13 @@ import (
 	"github.com/joninhasamerico/controle-financeiro-api/internal/controllers/rest_err"
 	"github.com/joninhasamerico/controle-financeiro-api/internal/model"
 	"github.com/joninhasamerico/controle-financeiro-api/internal/repository"
+	"github.com/joninhasamerico/controle-financeiro-api/internal/repository/interfacerepository"
 	"github.com/joninhasamerico/controle-financeiro-api/pkg/auth"
 	"gorm.io/gorm"
 )
 
 type LoginController struct {
-	Repo repository.IUsuarioRepository
+	Repo interfacerepository.IUsuarioRepository
 }
 
 func NewLoginController(rotaMain *gin.RouterGroup, dbCtx *gorm.DB) {

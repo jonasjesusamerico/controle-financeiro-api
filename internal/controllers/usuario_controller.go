@@ -11,6 +11,7 @@ import (
 	"github.com/joninhasamerico/controle-financeiro-api/internal/model"
 	"github.com/joninhasamerico/controle-financeiro-api/internal/repository"
 	"github.com/joninhasamerico/controle-financeiro-api/internal/services"
+	"github.com/joninhasamerico/controle-financeiro-api/internal/services/interfaceservice"
 	"gorm.io/gorm"
 )
 
@@ -20,7 +21,7 @@ type ResponseError struct {
 
 type UsuarioController struct {
 	BaseController
-	service services.IUsuarioService
+	service interfaceservice.IUsuarioService
 }
 
 func NewUsuarioController(rotaMain *gin.RouterGroup, rotaV1 *gin.RouterGroup, dbCtx *gorm.DB, timeoutCtx time.Duration) {

@@ -1,4 +1,4 @@
-package controllers
+package interfacecontroller
 
 type IUsuarioController interface {
 	IController

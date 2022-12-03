@@ -1,4 +1,4 @@
-package services
+package interfaceservice
 
 type IUsuarioService interface {
 	IService
