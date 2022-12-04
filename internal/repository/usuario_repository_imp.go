@@ -59,14 +59,14 @@ func (m *UsuarioRepository) Delete(ctx context.Context, model interfacemodel.IMo
 
 func (m *UsuarioRepository) GetByEmail(email string, usuario interfacemodel.IModel) (err error) {
 
-	if err := m.base.Repo().Where("email = ?", email).First(&usuario).Error; err != nil {
+	if err := m.base.Repo().Where("email = ?", email).First(usuario).Error; err != nil {
 		return model.ErrNotFound
 	}
 
 	return nil
 }
 
-func (m *UsuarioRepository) CreateUserLogin(usuario interfacemodel.IModel) (err error) {
+func (m *UsuarioRepository) CreateUserLogin(usuario interfacemodel.IUsuario) (err error) {
 	if err = m.base.Repo().Create(usuario).Error; err != nil {
 		return err
 	}

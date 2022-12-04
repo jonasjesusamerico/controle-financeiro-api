@@ -1,4 +1,4 @@
-package model
+package usuario
 
 import (
 	"strings"
@@ -8,7 +8,7 @@ import (
 	"gorm.io/gorm"
 )
 
-type Usuario struct {
+type usuario struct {
 	ID        uint64    `json:"id,omitempty"`
 	Email     string    `json:"email,omitempty" validate:"required"`
 	Senha     string    `json:"senha,omitempty" validate:"required"`
@@ -17,22 +17,34 @@ type Usuario struct {
 	CreatedAt time.Time `json:"created_at"`
 }
 
-func (a *Usuario) TableName() string {
+func NewUsuario() *usuario {
+	return &usuario{}
+}
+
+func NewSliceUsuario() []usuario {
+	return []usuario{}
+}
+
+func (a *usuario) TableName() string {
 	return "usuarios"
 }
 
-func (u *Usuario) AfterCreate(tx *gorm.DB) (err error) {
+func (u *usuario) AfterCreate(tx *gorm.DB) (err error) {
 	if u.TenantID == 0 {
 		tx.Model(u).Update("tenant_id", u.ID)
 	}
 	return
 }
 
-func (u Usuario) GetId() uint64 {
+func (u usuario) GetId() uint64 {
 	return u.ID
 }
 
-func (u *Usuario) Validar() (erro error) {
+func (u usuario) GetEmail() string {
+	return u.Email
+}
+
+func (u *usuario) Validar() (erro error) {
 	u.Email = strings.TrimSpace(u.Email)
 
 	senhaComHash, erro := auth.Hash(u.Senha)
@@ -45,8 +57,8 @@ func (u *Usuario) Validar() (erro error) {
 	return
 }
 
-func (u Usuario) GetUsuarioRetorno() Usuario {
-	return Usuario{
+func (u usuario) GetUsuarioRetorno() usuario {
+	return usuario{
 		ID:    u.ID,
 		Email: u.Email,
 		Senha: "",

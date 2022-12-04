@@ -2,10 +2,10 @@ package database
 
 import (
 	"github.com/joninhasamerico/controle-financeiro-api/configs"
-	"github.com/joninhasamerico/controle-financeiro-api/internal/model"
 	"github.com/joninhasamerico/controle-financeiro-api/internal/model/comprador"
 	"github.com/joninhasamerico/controle-financeiro-api/internal/model/conta"
 	"github.com/joninhasamerico/controle-financeiro-api/internal/model/setor"
+	"github.com/joninhasamerico/controle-financeiro-api/internal/model/usuario"
 	_ "github.com/lib/pq"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
@@ -23,9 +23,10 @@ func Conect() (db *gorm.DB, err error) {
 	}
 
 	/* auto migrate model */
-	db.AutoMigrate(&model.Usuario{})
+	db.AutoMigrate(usuario.NewUsuario())
 	db.AutoMigrate(conta.NewConta())
 	db.AutoMigrate(setor.NewSetor())
 	db.AutoMigrate(comprador.NewComprador())
+
 	return
 }

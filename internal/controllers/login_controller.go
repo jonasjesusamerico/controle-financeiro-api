@@ -7,6 +7,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/joninhasamerico/controle-financeiro-api/internal/controllers/rest_err"
 	"github.com/joninhasamerico/controle-financeiro-api/internal/model"
+	"github.com/joninhasamerico/controle-financeiro-api/internal/model/usuario"
 	"github.com/joninhasamerico/controle-financeiro-api/internal/repository"
 	"github.com/joninhasamerico/controle-financeiro-api/internal/repository/interfacerepository"
 	"github.com/joninhasamerico/controle-financeiro-api/pkg/auth"
@@ -35,23 +36,23 @@ func (lc LoginController) NameGroupRoute() string {
 }
 
 func (lc LoginController) Login(c *gin.Context) {
-	var usuario model.Usuario
+	user := usuario.NewUsuario()
 
-	if err := c.ShouldBindJSON(&usuario); err != nil {
+	if err := c.ShouldBindJSON(&user); err != nil {
 		errRest := rest_err.NewBadRequestError(err.Error())
 		c.JSON(errRest.Code, errRest)
 		return
 	}
 
-	usuarioSalvoNoBanco := model.Usuario{}
-	err := lc.Repo.GetByEmail(usuario.Email, &usuarioSalvoNoBanco)
+	usuarioSalvoNoBanco := usuario.NewUsuario()
+	err := lc.Repo.GetByEmail(user.Email, usuarioSalvoNoBanco)
 	if err != nil {
 		errRest := rest_err.NewNotFoundError("The email entered is not a valid email")
 		c.JSON(errRest.Code, errRest)
 		return
 	}
 
-	if err = auth.VerificarSenha(usuarioSalvoNoBanco.Senha, usuario.Senha); err != nil {
+	if err = auth.VerificarSenha(usuarioSalvoNoBanco.Senha, user.Senha); err != nil {
 		errRest := rest_err.NewForbiddenError(err.Error())
 		c.JSON(errRest.Code, errRest)
 		return

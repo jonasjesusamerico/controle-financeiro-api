@@ -8,7 +8,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/joninhasamerico/controle-financeiro-api/internal/controllers/rest_err"
-	"github.com/joninhasamerico/controle-financeiro-api/internal/model"
+	"github.com/joninhasamerico/controle-financeiro-api/internal/model/usuario"
 	"github.com/joninhasamerico/controle-financeiro-api/internal/repository"
 	"github.com/joninhasamerico/controle-financeiro-api/internal/services"
 	"github.com/joninhasamerico/controle-financeiro-api/internal/services/interfaceservice"
@@ -44,7 +44,7 @@ func NewUsuarioController(rotaMain *gin.RouterGroup, rotaV1 *gin.RouterGroup, db
 func (a *UsuarioController) FetchUsuario(c *gin.Context) {
 	ctx := a.Ctx(c)
 
-	var usuarios []model.Usuario
+	usuarios := usuario.NewSliceUsuario()
 
 	err := a.service.FindAll(ctx, &usuarios)
 	if err != nil {
@@ -67,7 +67,7 @@ func (a *UsuarioController) GetByID(c *gin.Context) {
 	id := int64(idP)
 	ctx := a.Ctx(c)
 
-	usuario := model.Usuario{}
+	usuario := *usuario.NewUsuario()
 
 	err = a.service.GetByID(ctx, &usuario, id)
 	if err != nil {
@@ -80,22 +80,22 @@ func (a *UsuarioController) GetByID(c *gin.Context) {
 }
 
 func (a *UsuarioController) Save(c *gin.Context) {
-	var usuario model.Usuario
-	err := c.ShouldBindJSON(&usuario)
+	user := *usuario.NewUsuario()
+	err := c.ShouldBindJSON(&user)
 	if err != nil {
 		errRest := rest_err.NewUnprocessableEntityError(err.Error())
 		c.JSON(errRest.Code, errRest)
 		return
 	}
 
-	err = a.service.Save(context.TODO(), &usuario)
+	err = a.service.Save(context.TODO(), &user)
 	if err != nil {
 		errRest := rest_err.NewInternalServerError(err.Error())
 		c.JSON(errRest.Code, errRest)
 		return
 	}
 
-	c.JSON(http.StatusCreated, usuario.GetUsuarioRetorno())
+	c.JSON(http.StatusCreated, user.GetUsuarioRetorno())
 }
 
 func (a *UsuarioController) Delete(c *gin.Context) {
