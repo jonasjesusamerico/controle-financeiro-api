@@ -4,6 +4,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/joninhasamerico/controle-financeiro-api/internal/model/enum"
 	"github.com/joninhasamerico/controle-financeiro-api/pkg/auth"
 	"gorm.io/gorm"
 )
@@ -31,7 +32,7 @@ func (a *usuario) TableName() string {
 
 func (u *usuario) AfterCreate(tx *gorm.DB) (err error) {
 	if u.TenantID == 0 {
-		tx.Model(u).Update("tenant_id", u.ID)
+		tx.Model(u).Update(string(enum.TENANT_ID), u.ID)
 	}
 	return
 }
@@ -55,6 +56,10 @@ func (u *usuario) Validar() (erro error) {
 	u.Senha = string(senhaComHash)
 
 	return
+}
+
+func (l *usuario) SetTenant(tenantId int64) {
+	l.TenantID = tenantId
 }
 
 func (u usuario) GetUsuarioRetorno() usuario {

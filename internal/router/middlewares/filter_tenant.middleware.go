@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/joninhasamerico/controle-financeiro-api/internal/model/enum"
 	"github.com/joninhasamerico/controle-financeiro-api/pkg/auth"
 )
 
@@ -17,7 +18,7 @@ func FilterTenantMiddleware() gin.HandlerFunc {
 			return
 		}
 
-		c.Set("tenantId", int64(tenantId))
+		c.Set(string(enum.TENANT_ID), int64(tenantId))
 		c.Next()
 	}
 }

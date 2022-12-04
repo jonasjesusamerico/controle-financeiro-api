@@ -4,6 +4,7 @@ import (
 	"github.com/joninhasamerico/controle-financeiro-api/configs"
 	"github.com/joninhasamerico/controle-financeiro-api/internal/model/comprador"
 	"github.com/joninhasamerico/controle-financeiro-api/internal/model/conta"
+	"github.com/joninhasamerico/controle-financeiro-api/internal/model/lancamento"
 	"github.com/joninhasamerico/controle-financeiro-api/internal/model/setor"
 	"github.com/joninhasamerico/controle-financeiro-api/internal/model/usuario"
 	_ "github.com/lib/pq"
@@ -27,6 +28,7 @@ func Conect() (db *gorm.DB, err error) {
 	db.AutoMigrate(conta.NewConta())
 	db.AutoMigrate(setor.NewSetor())
 	db.AutoMigrate(comprador.NewComprador())
+	db.AutoMigrate(lancamento.NewLancamento())
 
 	return
 }

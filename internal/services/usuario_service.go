@@ -28,7 +28,7 @@ func (a *UsuarioService) FindAll(ctx context.Context, models interface{}) (err e
 	ctx, cancel := context.WithTimeout(ctx, a.contextTimeout)
 	defer cancel()
 
-	err = a.repository.FindAll(ctx, models)
+	err = a.repository.FindAll(ctx, []string{}, models)
 	if err != nil {
 		return err
 	}
@@ -77,7 +77,7 @@ func (a *UsuarioService) Delete(ctx context.Context, id int64) (err error) {
 	if existedUsuario == (*usuario.NewUsuario()) {
 		return model.ErrNotFound
 	}
-	return a.repository.Delete(ctx, existedUsuario, id)
+	return a.repository.Delete(ctx, &existedUsuario, id)
 }
 
 func (a *UsuarioService) GetByEmail(email string) (v interfacemodel.IModel, err error) {
@@ -87,7 +87,7 @@ func (a *UsuarioService) GetByEmail(email string) (v interfacemodel.IModel, err 
 		return nil, err
 	}
 
-	return u, nil
+	return &u, nil
 }
 
 func (a *UsuarioService) Teste() {

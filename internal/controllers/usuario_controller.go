@@ -15,10 +15,6 @@ import (
 	"gorm.io/gorm"
 )
 
-type ResponseError struct {
-	Message string `json:"message"`
-}
-
 type UsuarioController struct {
 	BaseController
 	service interfaceservice.IUsuarioService

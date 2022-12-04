@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/joninhasamerico/controle-financeiro-api/internal/model/enum"
+	"github.com/joninhasamerico/controle-financeiro-api/internal/model/interfacemodel"
 	"github.com/joninhasamerico/controle-financeiro-api/internal/repository/interfacerepository"
 	"gorm.io/gorm"
 )
@@ -29,5 +30,10 @@ func (b BaseRepository) TenantID(ctx context.Context) int64 {
 }
 
 func (b BaseRepository) Repo() *gorm.DB {
+	return b.dbCtx
+}
+
+func (b BaseRepository) SetTenant(ctx context.Context, model interfacemodel.IModel) *gorm.DB {
+	model.SetTenant(b.TenantID(ctx))
 	return b.dbCtx
 }

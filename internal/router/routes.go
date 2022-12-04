@@ -17,7 +17,7 @@ func NewSetupRouter(engine *gin.Engine, dbCtx *gorm.DB) {
 
 	/* Groups */
 	MAIN_GROUP := engine.Group("/")
-	API_GROUP := MAIN_GROUP.Group("/api", middlewares.FilterTenantMiddleware())
+	API_GROUP := MAIN_GROUP.Group("/api", middlewares.MiddleAuth(), middlewares.FilterTenantMiddleware())
 	V1_GROUP := API_GROUP.Group("/v1")
 
 	/* Login */
@@ -25,4 +25,7 @@ func NewSetupRouter(engine *gin.Engine, dbCtx *gorm.DB) {
 
 	/* Usuario */
 	controllers.NewUsuarioController(MAIN_GROUP, V1_GROUP, dbCtx, timeoutCtx)
+
+	/* Lancamento */
+	controllers.NewLancamentoController(V1_GROUP, dbCtx, timeoutCtx)
 }

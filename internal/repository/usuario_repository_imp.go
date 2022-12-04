@@ -5,6 +5,7 @@ import (
 
 	"github.com/joninhasamerico/controle-financeiro-api/internal/model"
 	"github.com/joninhasamerico/controle-financeiro-api/internal/model/interfacemodel"
+	"github.com/joninhasamerico/controle-financeiro-api/internal/model/usuario"
 	"github.com/joninhasamerico/controle-financeiro-api/internal/repository/interfacerepository"
 	"gorm.io/gorm"
 )
@@ -19,7 +20,7 @@ func NewUsuarioRepository(dbCtx *gorm.DB) interfacerepository.IUsuarioRepository
 	}
 }
 
-func (m *UsuarioRepository) FindAll(ctx context.Context, models interface{}) (err error) {
+func (m *UsuarioRepository) FindAll(ctx context.Context, preloads []string, models interface{}) (err error) {
 
 	if err = m.base.TenantCtx(ctx).Select("id", "email").Statement.Find(models).Error; err != nil {
 		return
@@ -44,7 +45,7 @@ func (m *UsuarioRepository) Update(ctx context.Context, model interfacemodel.IMo
 }
 
 func (m *UsuarioRepository) Save(ctx context.Context, model interfacemodel.IModel) (err error) {
-	if err = m.base.TenantCtx(ctx).Create(model).Error; err != nil {
+	if err = m.base.SetTenant(ctx, model).Create(model).Error; err != nil {
 		return err
 	}
 	return nil
@@ -71,4 +72,12 @@ func (m *UsuarioRepository) CreateUserLogin(usuario interfacemodel.IUsuario) (er
 		return err
 	}
 	return nil
+}
+
+func (m *UsuarioRepository) Exists(ctx context.Context, id int64) bool {
+	lancamento := usuario.NewUsuario()
+
+	var exists bool
+	m.base.TenantCtx(ctx).Model(&lancamento).Select("count(*) > 0").Where("id = ?", id).Find(&exists).Get("ID")
+	return exists
 }

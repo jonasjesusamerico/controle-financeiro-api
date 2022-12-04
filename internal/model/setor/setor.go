@@ -1,15 +1,15 @@
 package setor
 
-import "time"
+import (
+	"github.com/joninhasamerico/controle-financeiro-api/internal/model"
+)
 
-type setor struct {
+type Setor struct {
 	ID        int64
 	Descricao string
-	TenantID  int64     `json:"tenant_id"`
-	UpdatedAt time.Time `json:"updated_at"`
-	CreatedAt time.Time `json:"created_at"`
+	model.Tenant
 }
 
-func NewSetor() *setor {
-	return &setor{}
+func NewSetor() *Setor {
+	return &Setor{}
 }
