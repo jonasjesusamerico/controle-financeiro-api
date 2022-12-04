@@ -63,19 +63,16 @@ func (a *LancamentoController) GetByID(c *gin.Context) {
 		return
 	}
 
-	id := int64(idP)
-	ctx := a.Ctx(c)
+	l := *lancamento.NewLancamento()
 
-	lancamento := *lancamento.NewLancamento()
-
-	err = a.service.GetByID(ctx, &lancamento, id)
+	err = a.service.GetByID(a.Ctx(c), &l, int64(idP))
 	if err != nil {
 		errRest := rest_err.NewNotFoundError(err.Error())
 		c.JSON(errRest.Code, errRest)
 		return
 	}
 
-	c.JSON(http.StatusOK, lancamento)
+	c.JSON(http.StatusOK, l)
 }
 
 func (a *LancamentoController) Save(c *gin.Context) {
@@ -88,18 +85,16 @@ func (a *LancamentoController) Save(c *gin.Context) {
 		return
 	}
 
-	lancamento := *lancamento.LancamentoConverter(*lancamentoDto)
+	l := *lancamento.LancamentoConverter(*lancamentoDto)
 
-	ctx := a.Ctx(c)
-
-	err = a.service.Save(ctx, &lancamento)
+	err = a.service.Save(a.Ctx(c), &l)
 	if err != nil {
 		errRest := rest_err.NewInternalServerError(err.Error())
 		c.JSON(errRest.Code, errRest)
 		return
 	}
 
-	c.JSON(http.StatusCreated, lancamento)
+	c.JSON(http.StatusCreated, l)
 }
 
 func (a *LancamentoController) Delete(c *gin.Context) {
@@ -111,9 +106,7 @@ func (a *LancamentoController) Delete(c *gin.Context) {
 	}
 
 	id := int64(idP)
-	ctx := a.Ctx(c)
-
-	err = a.service.Delete(ctx, id)
+	err = a.service.Delete(a.Ctx(c), id)
 	if err != nil {
 		errRest := rest_err.NewNotFoundError(err.Error())
 		c.JSON(errRest.Code, errRest)

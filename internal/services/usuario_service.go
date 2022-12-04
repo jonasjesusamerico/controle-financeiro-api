@@ -61,7 +61,10 @@ func (a *UsuarioService) Save(ctx context.Context, models interfacemodel.IModel)
 	if existedUsuario != nil {
 		return err
 	}
-	usuario.Validar()
+	err = usuario.Validar()
+	if err != nil {
+		return
+	}
 	err = a.repository.CreateUserLogin(usuario)
 	return
 }

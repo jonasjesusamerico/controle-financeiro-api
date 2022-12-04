@@ -26,7 +26,7 @@ func NewSliceUsuario() []usuario {
 	return []usuario{}
 }
 
-func (a *usuario) TableName() string {
+func (u *usuario) TableName() string {
 	return "usuarios"
 }
 
@@ -58,8 +58,8 @@ func (u *usuario) Validar() (erro error) {
 	return
 }
 
-func (l *usuario) SetTenant(tenantId int64) {
-	l.TenantID = tenantId
+func (u *usuario) SetTenant(tenantId int64) {
+	u.TenantID = tenantId
 }
 
 func (u usuario) GetUsuarioRetorno() usuario {
